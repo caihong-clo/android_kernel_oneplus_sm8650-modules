@@ -37,9 +37,11 @@ synaptics_tcm2-y += touchpanel_healthinfo/touchpanel_exception.o
 
 obj-m += oplus_bsp_synaptics_tcm2.o
 oplus_bsp_synaptics_tcm2-y := $(synaptics_tcm2-y)
+# Keep the trace path relative to the -I directory above: stringifying an
+# absolute path expands predefined macros such as linux in linux-games.
 ccflags-y += \
 	-DCONFIG_TOUCHPANEL_OPLUS_MODULE \
 	-DBUILD_BY_BAZEL \
-	-DTOUCHPANEL_STATS_TRACE_INCLUDE_PATH=$(srctree)/$(src)/touchpanel_healthinfo
+	-DTOUCHPANEL_STATS_TRACE_INCLUDE_PATH=touchpanel_healthinfo
 
 KBUILD_EXTRA_SYMBOLS := $(M)/../oplus_touchscreen_v2/touch_custom/Module.symvers
