@@ -4886,6 +4886,8 @@ static void tp_resume(struct device *dev)
 	struct device_node *chip_np = NULL;
 	struct device_node *src_chip_np = NULL;
 	int i = 0;
+
+	ts->irq_freed_in_resume = false;
 	TP_INFO(ts->tp_index, "%s start.\n", __func__);
 
 	if (!ts->is_suspended) {
@@ -4913,6 +4915,7 @@ static void tp_resume(struct device *dev)
 			mutex_lock(&ts->mutex);
 		}
 		devm_free_irq(ts->dev, ts->irq, ts);
+		ts->irq_freed_in_resume = true;
 		if (ts->int_mode == UNBANNABLE) {
 			mutex_unlock(&ts->mutex);
 		}
@@ -5150,6 +5153,7 @@ static void lcd_on_early_event(struct touchpanel_data *ts)
 	} else if (ts->tp_resume_order == LCD_TP_RESUME) {
 		if (!(ts->tp_ic_type == TYPE_TDDI_TCM && ts->is_noflash_ic) && (ts->tp_irq_desc->depth == 0)) {
 			disable_irq_nosync(ts->irq);
+			ts->irq_disabled_by_lcd_on_early = true;
 		}
 	}
 };
@@ -5162,9 +5166,20 @@ static void lcd_on_event(struct touchpanel_data *ts)
 
 	if (ts->tp_resume_order == LCD_TP_RESUME) {
 		tp_resume(ts->dev);
-		if (!(ts->tp_ic_type == TYPE_TDDI_TCM && ts->is_noflash_ic)) {
+		/*
+		 * Re-enable only the disable done by lcd_on_early_event(),
+		 * and only when tp_resume() did not free the IRQ. If it
+		 * freed the IRQ, speedup_resume re-registers it via
+		 * tp_register_irq_func() (request auto-enables), so
+		 * enabling here would race that work (WARN on an
+		 * unregistered IRQ) or double-enable. If the IRQ was
+		 * freed, the worker owns re-enabling. TYPE_TDDI_TCM
+		 * no-flash never sets either flag, so it is unaffected.
+		 */
+		if (ts->irq_disabled_by_lcd_on_early && !ts->irq_freed_in_resume) {
 			enable_irq(ts->irq);
 		}
+		ts->irq_disabled_by_lcd_on_early = false;
 	}
 };
 

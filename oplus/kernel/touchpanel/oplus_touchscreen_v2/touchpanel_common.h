@@ -1151,6 +1151,8 @@ struct touchpanel_data {
 	bool bus_ready;                                     /*spi or i2c resume status*/
 	int limit_edge;                                     /*control state of limit edge*/
 	int is_suspended;                                   /*suspend/resume flow exec flag*/
+	bool irq_disabled_by_lcd_on_early;                /*lcd_on_early_event() disabled the IRQ*/
+	bool irq_freed_in_resume;                         /*tp_resume() freed the IRQ; speedup_resume re-registers it*/
 	suspend_resume_state suspend_state;	/*detail suspend/resume state*/
 	tp_resume_order tp_resume_order;
 	tp_suspend_order tp_suspend_order;
