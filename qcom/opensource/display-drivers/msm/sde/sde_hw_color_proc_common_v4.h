@@ -216,7 +216,8 @@ enum rc_param_c {
 
 enum rc_merge_mode {
 	RC_MERGE_SINGLE_PIPE = 0x0,
-	RC_MERGE_DUAL_PIPE   = 0x1
+	RC_MERGE_DUAL_PIPE   = 0x1,
+	RC_MERGE_QUAD_PIPE   = 0x3,
 };
 
 struct rc_config_table {
@@ -337,7 +338,35 @@ static struct rc_config_table config_table[] =  {
 		.merge_mode = RC_MERGE_DUAL_PIPE,
 		.merge_mode_en = RC_MERGE_SINGLE_PIPE,
 	},
-
+	/* RC_PARAM_A0 quad configurations */
+	{
+		.param_a = RC_PARAM_A0,
+		.param_b = RC_PARAM_B0,
+		.param_c = RC_PARAM_C5,
+		.merge_mode = RC_MERGE_QUAD_PIPE,
+		.merge_mode_en = RC_MERGE_QUAD_PIPE,
+	},
+	{
+		.param_a = RC_PARAM_A0,
+		.param_b = RC_PARAM_B1B2,
+		.param_c = RC_PARAM_C3,
+		.merge_mode = RC_MERGE_QUAD_PIPE,
+		.merge_mode_en = RC_MERGE_QUAD_PIPE,
+	},
+	{
+		.param_a = RC_PARAM_A0,
+		.param_b = RC_PARAM_B1,
+		.param_c = RC_PARAM_C0,
+		.merge_mode = RC_MERGE_QUAD_PIPE,
+		.merge_mode_en = RC_MERGE_SINGLE_PIPE,
+	},
+	{
+		.param_a = RC_PARAM_A0,
+		.param_b = RC_PARAM_B2,
+		.param_c = RC_PARAM_C1,
+		.merge_mode = RC_MERGE_QUAD_PIPE,
+		.merge_mode_en = RC_MERGE_SINGLE_PIPE,
+	},
 	/* RC_PARAM_A1 configurations */
 	{
 		.param_a = RC_PARAM_A1,
@@ -403,6 +432,35 @@ static struct rc_config_table config_table[] =  {
 		.merge_mode_en = RC_MERGE_SINGLE_PIPE,
 
 	},
+	/* RC_PARAM_A1 quad configurations */
+	{
+		.param_a = RC_PARAM_A1,
+		.param_b = RC_PARAM_B0,
+		.param_c = RC_PARAM_C5,
+		.merge_mode = RC_MERGE_QUAD_PIPE,
+		.merge_mode_en = RC_MERGE_QUAD_PIPE,
+	},
+	{
+		.param_a = RC_PARAM_A1,
+		.param_b = RC_PARAM_B1B2,
+		.param_c = RC_PARAM_C5,
+		.merge_mode = RC_MERGE_QUAD_PIPE,
+		.merge_mode_en = RC_MERGE_QUAD_PIPE,
+	},
+	{
+		.param_a = RC_PARAM_A1,
+		.param_b = RC_PARAM_B1,
+		.param_c = RC_PARAM_C4,
+		.merge_mode = RC_MERGE_QUAD_PIPE,
+		.merge_mode_en = RC_MERGE_SINGLE_PIPE,
+	},
+	{
+		.param_a = RC_PARAM_A1,
+		.param_b = RC_PARAM_B2,
+		.param_c = RC_PARAM_C2,
+		.merge_mode = RC_MERGE_QUAD_PIPE,
+		.merge_mode_en = RC_MERGE_SINGLE_PIPE,
+	},
 };
 
 static inline int _sde_hw_rc_get_enable_bits(
@@ -450,6 +508,8 @@ static inline int _sde_hw_rc_get_merge_mode(
 		*merge_mode = RC_MERGE_SINGLE_PIPE;
 	else if (hw_cfg->num_of_mixers == 2)
 		*merge_mode = RC_MERGE_DUAL_PIPE;
+	else if (hw_cfg->num_of_mixers == 4)
+		*merge_mode = RC_MERGE_QUAD_PIPE;
 	else {
 		DRM_ERROR("invalid number of mixers:%d\n",
 				hw_cfg->num_of_mixers);
