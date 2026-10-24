@@ -2663,14 +2663,15 @@ static void _sde_crtc_dest_scaler_setup(struct drm_crtc *crtc)
 			hw_ctl = sde_crtc->mixers[lm_idx].hw_ctl;
 			hw_ds  = sde_crtc->mixers[lm_idx].hw_ds;
 
-			/* Setup op mode - Dual/single */
+			/* Setup op mode - Quad/Dual/single */
 			if (cfg->flags & SDE_DRM_DESTSCALER_ENABLE)
 				op_mode |= BIT(hw_ds->idx - DS_0);
 
 			if (hw_ds->ops.setup_opmode) {
-				op_mode |= (cstate->num_ds_enabled ==
-					CRTC_DUAL_MIXERS_ONLY) ?
-					SDE_DS_OP_MODE_DUAL : 0;
+				if (cstate->num_ds_enabled == CRTC_DUAL_MIXERS_ONLY)
+					op_mode |= SDE_DS_OP_MODE_DUAL;
+				else if (cstate->num_ds_enabled == CRTC_QUAD_MIXERS)
+					op_mode |= SDE_DS_OP_MODE_QUAD;
 				hw_ds->ops.setup_opmode(hw_ds, op_mode);
 				SDE_EVT32_VERBOSE(DRMID(crtc), op_mode);
 			}
