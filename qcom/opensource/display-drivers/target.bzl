@@ -42,6 +42,9 @@ def define_pineapple(t, v, lt=None):
             "PXLW_IRIS_DUAL",
 #endif /* CONFIG_PXLW_IRIS */
             "CONFIG_MSM_EXT_DISPLAY",
+            # caihong panel support, passed as CAIHONG_DISPLAY_DRIVER=y
+            # to the make based build
+            "CAIHONG_DISPLAY_DRIVER",
         ],
         lunch_target = lt,
 )
